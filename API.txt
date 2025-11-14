@@ -1,0 +1,107 @@
+模块基本结构
+每个模块文件必须返回一个table：
+return {
+    -- 模块配置参数
+    enabled = false,
+    fov = 120,
+    smoothness = 0.5,
+    OnEnablee = function()
+    ----开启时调用
+    end,
+    OnDisablee = function()
+    ----关闭时调用
+    end,
+    -- 生命周期函数
+    OnUpdate = function(self, dt)
+        -- 每帧调用
+    end,
+    
+    OnDraw = function(self)
+        -- 绘制时调用
+    end,
+    
+    OnMousePressed = function(self, x, y, button)
+        -- 鼠标按下时调用
+        -- 返回true可阻止事件继续传播
+    end,
+    
+    OnMouseReleased = function(self, x, y, button)
+        -- 鼠标释放时调用
+    end,
+    
+    OnMouseMoved = function(self, x, y, dx, dy)
+        -- 鼠标移动时调用
+    end,
+    
+    OnKeyPressed = function(self, key)
+        -- 按键按下时调用
+        -- 返回true可阻止事件继续传播
+    end,
+    
+    OnTextInput = function(self, text)
+        -- 文本输入时调用
+        -- 返回true可阻止事件继续传播
+    end
+}
+
+UI组件注册API
+
+复选框 (Checkbox)
+UI.RegisterCheckbox("模块名", "显示标签", "配置键")
+示例：UI.RegisterCheckbox("Aimbot", "启用自瞄", "enabled")
+
+滑块 (Slider)
+UI.RegisterSlider("模块名", "显示标签", "配置键", 最小值, 最大值, 步长)
+示例：UI.RegisterSlider("Aimbot", "自瞄范围", "fov", 0, 360, 1)
+
+模式选择 (Mode)
+UI.RegisterMode("模块名", "显示标签", "配置键", {"选项1", "选项2", "选项3"})
+示例：UI.RegisterMode("Aimbot", "瞄准位置", "targetBone", {"头部", "胸部", "随机"})
+
+全局辅助函数
+
+findModuleInstanceGlobally(moduleName)
+全局查找模块实例
+示例：local potionModule = findModuleInstanceGlobally("potiondisplay")
+
+ty.SetPotionEffect(effectName, duration)
+添加/刷新药水效果
+示例：ty.SetPotionEffect("力量", 10) -- 添加10秒效果
+      ty.SetPotionEffect("力量", 0)  -- 移除效果
+
+ty.addIslandMessage(text)
+在岛显示提示
+示例：ty.addIslandMessage("模块已启用")
+
+事件处理说明
+
+输入事件优先级：
+1. UI文本输入（最高优先级）
+2. 模块的OnKeyPressed/OnTextInput
+3. 系统快捷键
+
+鼠标事件传播：
+模块可返回true来阻止事件继续传播
+
+配置自动保存
+- 所有模块参数自动保存到config.lua
+- 退出时自动保存，启动时自动加载
+- 支持GUI位置、模块开关状态、所有模块参数
+
+特殊说明
+- HUD模块在更新周期中最后执行，确保显示最新数据
+- 模块文件名应为小写
+- 配置键应与模块中的字段名一致
+- 药水效果显示受potiondisplay模块的showInIsland选项控制
+
+开发提示
+1. 使用pcall包装可能出错的生命周期函数调用
+2. 在OnUpdate中处理每帧逻辑
+3. 在OnDraw中处理自定义绘制
+4. 合理使用输入事件返回值控制事件传播
+5. 利用消息岛提供用户反馈
+
+调试支持
+- 所有操作记录到debug.log文件
+- 可通过ty.log("消息")记录调试信息
+- 启动时显示加载进度和错误信息
